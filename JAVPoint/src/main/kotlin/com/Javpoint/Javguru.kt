@@ -17,12 +17,10 @@ class Javguru : MainAPI() {
 
     override val mainPage = mainPageOf(
         "category/english-subbed" to "English Subbed",
-        "category/jav-uncensored" to "Jav Uncensored",
-        "category/4k" to "4K Category",
+        "tag/for-women" to "For Women",
         "tag/married-woman" to "Married Woman",
         "tag/mature-woman" to "Mature Woman",
-        "tag/big-tits" to "Big Tits",
-        "tag/stepmother" to "Stepmother",
+        "category/jav-uncensored" to "Jav Uncensored",
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
