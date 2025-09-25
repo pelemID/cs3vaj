@@ -21,6 +21,7 @@ class Javguru : MainAPI() {
         "tag/married-woman" to "Married Woman",
         "tag/mature-woman" to "Mature Woman",
         "category/jav-uncensored" to "Jav Uncensored",
+        "actress/hanamiya-amu/" to "Amu"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
