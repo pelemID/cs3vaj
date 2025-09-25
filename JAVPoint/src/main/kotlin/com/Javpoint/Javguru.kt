@@ -32,8 +32,8 @@ class Javguru : MainAPI() {
                 "category/fc2" to "FC2",
                 "category/idol" to "Idol",
                 "tag/drama" to "Drama",
-                "/tag/debut-production" to "Debut"
-                "tag/masturbation" to "Masturbation"
+                "/tag/debut-production" to "Debut",
+                "tag/masturbation" to "Masturbation",
                 "tag/married-woman" to "Married Woman",
                 "tag/mature-woman" to "Mature Woman",
                 "tag/best-of-2016" to "Best of 2016",
@@ -48,8 +48,8 @@ class Javguru : MainAPI() {
                 "studio/ipzz" to "IdeaPocket",
                 "studio/mida" to "Moodyz",
                 "studio/mida" to "Moodyz",
-                "series/身も心も相性抜群の2人-。想いと唇が重な" to "Compatibility"
-                "series/超高級中出し専門ソープ" to "Soapland"
+                "series/身も心も相性抜群の2人-。想いと唇が重な" to "Compatibility",
+                "series/超高級中出し専門ソープ" to "Soapland",
             ).shuffled().take(3).toTypedArray()
     )
 
