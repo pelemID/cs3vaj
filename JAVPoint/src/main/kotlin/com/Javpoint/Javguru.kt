@@ -43,7 +43,6 @@ class Javguru : MainAPI() {
                 "tag/best-of-2024" to "Best of 2024",
                 "studio/ipzz" to "IdeaPocket",
                 "studio/mida" to "Moodyz",
-                "studio/mida" to "Moodyz",
                 "series/身も心も相性抜群の2人-。想いと唇が重な" to "Compatibility",
                 "series/超高級中出し専門ソープ" to "Soapland",
             ).shuffled().take(3).toTypedArray()
