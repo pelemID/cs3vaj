@@ -15,15 +15,48 @@ class Javguru : MainAPI() {
     override val supportedTypes       = setOf(TvType.NSFW)
     override val vpnStatus            = VPNStatus.MightBeNeeded
 
+//    override val mainPage = mainPageOf(
+//        "category/english-subbed" to "English Subbed",
+//    )
+
     override val mainPage = mainPageOf(
-        "category/english-subbed" to "English Subbed",
-        "tag/for-women" to "For Women",
-        "tag/married-woman" to "Married Woman",
-        "tag/mature-woman" to "Mature Woman",
-        "category/jav-uncensored" to "Jav Uncensored",
-        "actress/hanamiya-amu" to "Amu"
+        // Fixed entries
+            "category/english-subbed" to "English Subbed",
+            "tag/for-women" to "For Women",
+            "actress/hanamiya-amu" to "Amu",
+
+        // Random 3 every refresh
+            *listOf(
+                "category/jav-uncensored" to "Uncensored",
+                "category/amateur" to "Amateur",
+                "category/fc2" to "FC2",
+                "category/idol" to "Idol",
+                "tag/drama" to "Drama",
+                "/tag/debut-production" to "Debut"
+                "tag/masturbation" to "Masturbation"
+                "tag/married-woman" to "Married Woman",
+                "tag/mature-woman" to "Mature Woman",
+                "tag/best-of-2016" to "Best of 2016",
+                "tag/best-of-2017" to "Best of 2017",
+                "tag/best-of-2018" to "Best of 2018",
+                "tag/best-of-2019" to "Best of 2019",
+                "tag/best-of-2020" to "Best of 2020",
+                "tag/best-of-2021" to "Best of 2021",
+                "tag/best-of-2022" to "Best of 2022",
+                "tag/best-of-2023" to "Best of 2023",
+                "tag/best-of-2024" to "Best of 2024",
+                "studio/ipzz" to "IdeaPocket",
+                "studio/mida" to "Moodyz",
+                "studio/mida" to "Moodyz",
+                "series/身も心も相性抜群の2人-。想いと唇が重な" to "Compatibility"
+                "series/超高級中出し専門ソープ" to "Soapland"
+            ).shuffled().take(3).toTypedArray()
     )
 
+
+
+
+    
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val document = app.get("$mainUrl/${request.data}/page/$page").document
         val home = document.select("#main > div")
