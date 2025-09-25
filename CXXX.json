@@ -1,0 +1,8 @@
+{
+    "name": "CXXX",
+    "description": "CXXX Repository",
+    "manifestVersion": 1,
+    "pluginLists": [
+      "https://raw.githubusercontent.com/pelemID/cs3vaj/builds/plugins.json"
+    ]
+  }
