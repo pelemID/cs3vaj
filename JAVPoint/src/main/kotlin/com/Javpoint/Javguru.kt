@@ -6,6 +6,7 @@ import com.lagradost.api.Log
 import org.jsoup.nodes.Element
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class Javguru : MainAPI() {
     override var mainUrl              = "https://jav.guru/"
@@ -88,6 +89,16 @@ class Javguru : MainAPI() {
         return searchResponse
     }
 
+/*
+    private fun cariArtis(query: String): List<SearchResponse> {
+        //pisahin dulu keyword nama
+
+        //masukin ke kueri
+        val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$kueri1+kueri2+kueri3").document
+
+    }
+*/
+        
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
 
@@ -106,7 +117,8 @@ class Javguru : MainAPI() {
                     ?.eachText()
                     ?.joinToString(", ")
                     .orEmpty()
-        
+
+        val actress = 
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
             this.plot      = description
