@@ -105,7 +105,8 @@ class Javguru : MainAPI() {
                     ?.trim()
                     ?: document.select("li:has(strong:matchesOwn(Actress)) a")
                     ?.eachText()
-                    .joinToString(", ")
+                    ?.joinToString(", ")
+                    .orEmpty()
         
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
