@@ -67,7 +67,8 @@ class Javguru : MainAPI() {
         val document = app.get(url).document
 
         val title= document.selectFirst("div.posts > h1")?.text().toString()
-        val poster = document.selectFirst("div.large-screenimg img")?.attr("src")?.trim().toString()
+//        val poster = document.selectFirst("div.large-screenimg > img")?.attr("src")?.trim().toString()
+        val poster = document.selectFirst("div.wp-content > p > img")?.attr("src")?.trim().toString()
         val description = document.selectFirst("div.wp-content p")?.text().toString()
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
