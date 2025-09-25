@@ -10,11 +10,11 @@ import com.lagradost.cloudstream3.extractors.Voe
 @CloudstreamPlugin
 class JavpointProvider: Plugin() {
     override fun load(context: Context) {
-        registerMainAPI(Javdoe())
+//        registerMainAPI(Javdoe())
         registerMainAPI(Javgg())
         registerMainAPI(Javguru())
-        registerMainAPI(JavEnglish())
-        registerMainAPI(Javangel())
+//        registerMainAPI(JavEnglish())
+//        registerMainAPI(Javangel())
         registerExtractorAPI(DoodJav())
         registerExtractorAPI(d000d())
         registerExtractorAPI(VidhideVIP())
