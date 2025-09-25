@@ -15,10 +15,6 @@ class Javguru : MainAPI() {
     override val supportedTypes       = setOf(TvType.NSFW)
     override val vpnStatus            = VPNStatus.MightBeNeeded
 
-//    override val mainPage = mainPageOf(
-//        "category/english-subbed" to "English Subbed",
-//    )
-
     override val mainPage = mainPageOf(
         // Fixed entries
             "category/english-subbed" to "English Subbed",
@@ -52,9 +48,6 @@ class Javguru : MainAPI() {
                 "series/超高級中出し専門ソープ" to "Soapland",
             ).shuffled().take(3).toTypedArray()
     )
-
-
-
 
     
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -100,8 +93,6 @@ class Javguru : MainAPI() {
         val document = app.get(url).document
 
         val title= document.selectFirst("div.posts > h1")?.text().toString()
-//        val poster = document.selectFirst("div.large-screenimg > img")?.attr("src")?.trim().toString()
-//        val poster = document.selectFirst("div.wp-content > p > img")?.attr("src")?.trim().toString()
         val poster = document.selectFirst("div.wp-content > p > img")
                     ?.attr("src")
                     ?.trim()
@@ -109,7 +100,13 @@ class Javguru : MainAPI() {
                     ?.attr("src")
                     ?.trim()
                     .orEmpty()
-        val description = document.selectFirst("div.wp-content p")?.text().toString().orEmpty()
+        val description = document.selectFirst("div.wp-content p")
+                    ?.text()
+                    ?.trim()
+                    ?: document.select("li:has(strong:matchesOwn(Actress)) a")
+                    ?.eachText()
+                    .joinToString(", ")
+        
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
             this.plot      = description
