@@ -90,7 +90,7 @@ class Javguru : MainAPI() {
     }
 
 
-    private fun findposAct(namanya: String) : String {
+    private suspend fun findposAct(namanya: String) : String {
         val encodedName = namanya.trim().replace(" ", "+")
         val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$encodedName").document
         
