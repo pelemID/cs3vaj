@@ -120,7 +120,7 @@ class Javguru : MainAPI() {
 
          val actors = document.select("li:has(strong:matchesOwn(Actress)) a").map {
                     Actor(
-                            it.text, it.text
+                            it.text(), it.text()
                             //findposAct(it.text)
                     )
                 }
