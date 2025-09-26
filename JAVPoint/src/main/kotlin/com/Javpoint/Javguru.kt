@@ -20,6 +20,7 @@ class Javguru : MainAPI() {
         // Fixed entries
             "" to "Main Page",
             "category/english-subbed" to "English Subbed",
+            "category/english-subbed/?orderby=likes&order=DESC" to "English Subbed most likes",
             "tag/for-women" to "For Women",
             "actress/hanamiya-amu" to "Amu",
 
@@ -121,7 +122,7 @@ class Javguru : MainAPI() {
                     ?.joinToString(", ")
                     .orEmpty()
 
-         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(5).map {
+         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(8).map {
                     Actor(
                             it.text(),
                             findposAct(it.text())
