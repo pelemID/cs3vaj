@@ -89,15 +89,17 @@ class Javguru : MainAPI() {
         return searchResponse
     }
 
-/*
-    private fun findposAct(query: String) {
-        //pisahin dulu keyword nama
 
-        //masukin ke kueri
-        val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$kueri1+kueri2+kueri3").document
-
+    private fun findposAct(namanya: String) : String {
+        val encodedName = namanya.trim().replace(" ", "+")
+        val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$encodedName").document
+        
+        // find <img> where alt == namanya
+        return document.selectFirst("div.actress-pic img[alt=\"$namanya\"]")
+                ?.attr("src")
+                .orEmpty()
     }
-*/
+
         
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
@@ -120,8 +122,8 @@ class Javguru : MainAPI() {
 
          val actors = document.select("li:has(strong:matchesOwn(Actress)) a").map {
                     Actor(
-                            it.text(), it.text()
-                            //findposAct(it.text)
+                            it.text(),
+                            findposAct(it.text())
                     )
                 }
                     
