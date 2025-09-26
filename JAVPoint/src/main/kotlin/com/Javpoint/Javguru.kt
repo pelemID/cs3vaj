@@ -18,7 +18,7 @@ class Javguru : MainAPI() {
 
     override val mainPage = mainPageOf(
         // Fixed entries
-            "" to "Main Page"
+            "" to "Main Page",
             "category/english-subbed" to "English Subbed",
             "tag/for-women" to "For Women",
             "actress/hanamiya-amu" to "Amu",
