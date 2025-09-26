@@ -18,6 +18,7 @@ class Javguru : MainAPI() {
 
     override val mainPage = mainPageOf(
         // Fixed entries
+            "" to "Main Page"
             "category/english-subbed" to "English Subbed",
             "tag/for-women" to "For Women",
             "actress/hanamiya-amu" to "Amu",
@@ -120,7 +121,7 @@ class Javguru : MainAPI() {
                     ?.joinToString(", ")
                     .orEmpty()
 
-         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").map {
+         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(5).map {
                     Actor(
                             it.text(),
                             findposAct(it.text())
