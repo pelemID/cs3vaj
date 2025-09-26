@@ -90,7 +90,7 @@ class Javguru : MainAPI() {
     }
 
 /*
-    private fun cariArtis(query: String): List<SearchResponse> {
+    private fun findposAct(query: String) {
         //pisahin dulu keyword nama
 
         //masukin ke kueri
@@ -118,10 +118,18 @@ class Javguru : MainAPI() {
                     ?.joinToString(", ")
                     .orEmpty()
 
-        val actress = 
+         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").map {
+                    Actor(
+                            it.text, it.text
+                            //findposAct(it.text)
+                    )
+                }
+                    
+        //val actress = cariArtis(document.select("li:has(strong:matchesOwn(Actress)) a")?.eachText()
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
             this.plot      = description
+            addActors(actors)
         }
     }
 
