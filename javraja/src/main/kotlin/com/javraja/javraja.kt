@@ -30,7 +30,7 @@ class javraja : MainAPI() {
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get("$mainUrl/${request.data}/?page=$page"").document
+        val document = app.get("$mainUrl/${request.data}/?page=$page").document
         val home =  document.select("div.bx").map { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -153,6 +153,7 @@ class javraja : MainAPI() {
     }
 
 }
+
 
 
 
