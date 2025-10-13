@@ -30,7 +30,7 @@ class javraja : MainAPI() {
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get("$mainUrl/${request.data}/").document
+        val document = app.get("$mainUrl/${request.data}/?page=$page"").document
         val home =  document.select("div.bx").map { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -81,11 +81,15 @@ class javraja : MainAPI() {
         
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
-
-        val title= document.selectFirst("div.bixbox > h1")?.text().toString()
-        val poster = document.selectFirst("div.video-container > img")?.attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg") ?: "Unknown"
-        val description = document.selectFirst("div.bixbox > div.right > div > p")?.text().trim() ?: "Unknown"
-
+        val title = document.selectFirst("div.bixbox > h1")?.text().orEmpty()
+        val poster = document.selectFirst("div.video-container > img")?.attr("src")
+                    ?.replace(Regex("(_resized)?\\.webp$"), ".jpg")
+                    ?: "Unknown"
+        val description = document.selectFirst("div.bixbox > div.right > div > p")
+                    ?.text()
+                    ?.trim()
+                    ?: "Unknown"
+        
         //val actors = document.select(""div.bixbox > div.right > div > ul ").take(8).map {
         //            Actor(
         //                    it.text(),
@@ -149,6 +153,7 @@ class javraja : MainAPI() {
     }
 
 }
+
 
 
 
