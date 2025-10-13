@@ -83,8 +83,8 @@ class javraja : MainAPI() {
         val document = app.get(url).document
 
         val title= document.selectFirst("div.bixbox > h1")?.text().toString()
-        val poster = document.selectFirst("div.video-container > img").attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg").orEmpty()
-        val description = document.selectFirst("div.bixbox > div.right > div > p")?.text().trim().orEmpty()
+        val poster = document.selectFirst("div.video-container > img").attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg")
+        val description = document.selectFirst("div.bixbox > div.right > div > p")?.text().trim()
 
         //val actors = document.select(""div.bixbox > div.right > div > ul ").take(8).map {
         //            Actor(
@@ -149,6 +149,7 @@ class javraja : MainAPI() {
     }
 
 }
+
 
 
 
