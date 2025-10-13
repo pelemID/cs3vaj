@@ -18,7 +18,7 @@ class javraja : MainAPI() {
 
     override val mainPage = mainPageOf(
         // Fixed entries
-            "" to "Main Page",
+//            "" to "Main Page",
             "jav-sub-indo-terbaru" to "Terbaru",
             //"category/english-subbed/?orderby=likes&order=DESC" to "English Subbed most likes",
             //"tag/for-women" to "For Women",
@@ -45,7 +45,7 @@ class javraja : MainAPI() {
     private fun Element.toSearchResult(): SearchResponse {
         val title     = this.select("a.tip").attr("title")
         val href      = this.select("a.tip").attr("href")
-        val posterUrl = this.select("a.tip > img").attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg")
+        val posterUrl = this.select("a.tip > div.limit > img").attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
@@ -161,4 +161,5 @@ class javraja : MainAPI() {
     }
 
 }
+
 
