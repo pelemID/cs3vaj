@@ -82,34 +82,22 @@ class javraja : MainAPI() {
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
 
-        val title= document.selectFirst("div.posts > h1")?.text().toString()
-        val poster = document.selectFirst("div.wp-content > p > img")
-                    ?.attr("src")
-                    ?.trim()
-                    ?: document.selectFirst("div.large-screenimg > img")
-                    ?.attr("src")
-                    ?.trim()
-                    .orEmpty()
-        val description = document.selectFirst("div.wp-content p")
-                    ?.text()
-                    ?.trim()
-                    ?: document.select("li:has(strong:matchesOwn(Actress)) a")
-                    ?.eachText()
-                    ?.joinToString(", ")
-                    .orEmpty()
+        val title= document.selectFirst("div.bixbox > h1")?.text().toString()
+        val poster = document.selectFirst("div.video-container > img").attr("src").replace(Regex("(_resized)?\\.webp$"), ".jpg").orEmpty()
+        val description = document.selectFirst("div.bixbox > div.right > div > p")?.text()?.trim().orEmpty()
 
-         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(8).map {
-                    Actor(
-                            it.text(),
-                            findposAct(it.text())
-                    )
-                }
+        //val actors = document.select(""div.bixbox > div.right > div > ul ").take(8).map {
+        //            Actor(
+        //                    it.text(),
+        //                    findposAct(it.text())
+        //            )
+        //        }
                     
         //val actress = cariArtis(document.select("li:has(strong:matchesOwn(Actress)) a")?.eachText()
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
             this.plot      = description
-            addActors(actors)
+            //addActors(actors)
         }
     }
 
@@ -161,5 +149,6 @@ class javraja : MainAPI() {
     }
 
 }
+
 
 
