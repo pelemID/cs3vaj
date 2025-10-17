@@ -20,7 +20,7 @@ class Javsubid : MainAPI() {
         // Fixed entries
             "category/jav-sub-indo?filter=latest" to "Terbaru",
             "category/jav-sub-indo?filter=most-viewed" to "Populer",
-            "category/jav-sub-indo?filter=longest" to "Cerita Panjang"
+            "category/jav-sub-indo?filter=longest" to "Cerita Panjang",
             "category/jav-sub-indo?filter=random" to "Acak",
     )
     
@@ -45,8 +45,8 @@ class Javsubid : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse {
         val title = this.select("article > a").attr("title")
-        val href = fixUrl(this.select("article > a").attr("href"))
-        val posterUrl = fixUrlNull(this.select("article > a > div > div > img").attr("data-src"))
+        val href = this.select("article > a").attr("href"))
+        val posterUrl = this.select("article > a > div > div > img").attr("data-src"))
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
