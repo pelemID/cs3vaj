@@ -9,10 +9,20 @@ class JavGuruPlugin: Plugin() {
     override fun load(context: Context) {
         // All providers should be added in this manner. Please don't edit the providers list directly.
         registerMainAPI(JavGuru())
-        registerExtractorAPI(StreamTape())
-        registerExtractorAPI(Stbturbo())
-        registerExtractorAPI(Turbovid())
-        registerExtractorAPI(MyCloudZ())
-        registerExtractorAPI(Cloudwish())
+        registerExtractorAPI(DoodJav())
+        registerExtractorAPI(javclan())
+        registerExtractorAPI(Streamwish())
+        registerExtractorAPI(Maxstream())
+        registerExtractorAPI(Vidhidepro())
+        registerExtractorAPI(Vidhidepro())
+        registerExtractorAPI(Ds2Play())
+        registerExtractorAPI(Streamhihi())
+        registerExtractorAPI(Javlion())
+        registerExtractorAPI(VidhideVIP())
+        registerExtractorAPI(Javsw())
+        registerExtractorAPI(swhoi())
+        registerExtractorAPI(MixDropis())
+        registerExtractorAPI(Javmoon())
+        registerExtractorAPI(d000d())
     }
 }
