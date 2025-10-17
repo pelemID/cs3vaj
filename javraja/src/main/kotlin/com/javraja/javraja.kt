@@ -7,6 +7,10 @@ import org.jsoup.nodes.Element
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.httpsify
+import com.lagradost.cloudstream3.utils.loadExtractor
+
 
 class javraja : MainAPI() {
     override var mainUrl              = "https://ruangjav.com"
@@ -36,7 +40,7 @@ class javraja : MainAPI() {
             list = HomePageList(
                 name = request.name,
                 list = home,
-                isHorizontalImages = true
+                isHorizontalImages = false
             ),
             hasNext = true
         )
@@ -105,54 +109,56 @@ class javraja : MainAPI() {
         }
     }
 
-     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
-        val document = app.get(data).document
-        val script=document.select("script:containsData(iframe_url)").html()
-        val IFRAME_B64_REGEX = Regex(""""iframe_url":"([^"]+)"""")
-         val iframeUrls = IFRAME_B64_REGEX.findAll(script)
-             .map { it.groupValues[1] }
-             .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
-             .toList()
-         iframeUrls.forEach {
-             Log.d("Phisher",it)
-             val iframedoc=app.get(it, referer = it).document
-             val olid=iframedoc.toString().substringAfter("var OLID = '").substringBefore("'")
-             val newreq=iframedoc.toString().substringAfter("iframe").substringAfter("src=\"").substringBefore("'+OLID")
-             val reverseid= olid.edoceD()
-             val location= app.get("$newreq$reverseid", referer = it, allowRedirects = false)
-             val link=location.headers["location"].toString()
-             if (link.contains(".m3u"))
-             {
-                 callback.invoke(
-                     newExtractorLink(
-                         source = name,
-                         name = name,
-                         url = link,
-                         INFER_TYPE
-                     ) {
-                         this.referer = ""
-                         this.quality = getQualityFromName("")
-                     }
-                 )
-             }
-             else{
-                 loadExtractor(link, referer = it,subtitleCallback,callback)
-             }
-         }
-        return true
-    }
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val parts = data.split("#")
+        val url = parts[0]
+        val epTag = parts.getOrNull(1)
+        var found = false
 
-    fun String.edoceD(): String {
-        var x = this.length - 1
-        var edoceD = ""
-        while (x >= 0) {
-            edoceD += this[x]
-            x--
+        val doc = app.get(url).document
+
+        if (epTag != null) {
+            // ---- SERIES ----
+            val epNum = epTag.removePrefix("ep").toIntOrNull()
+            val box = doc.select("div.bixbox").getOrNull(epNum?.minus(1) ?: 0)
+            val iframe = box?.selectFirst("iframe")?.attr("src")
+            if (iframe != null) {
+                loadExtractor(iframe, url, subtitleCallback, callback)
+                found = true
+            }
+        } else {
+            // ---- MOVIE ----
+            // 1. iframe utama
+            doc.select("div#embed_holder iframe").forEach { iframe ->
+                loadExtractor(iframe.attr("src"), url, subtitleCallback, callback)
+                found = true
+            }
+
+            // 2. mirror links
+            doc.select("ul.mirror li a[data-href]").forEach { a ->
+                val mirrorUrl = a.attr("data-href")
+                val mirrorDoc = app.get(mirrorUrl).document
+                val iframe = mirrorDoc.selectFirst("div#embed_holder iframe")?.attr("src")
+                if (iframe != null) {
+                    loadExtractor(iframe, mirrorUrl, subtitleCallback, callback)
+                    found = true
+                }
+            }
         }
-        return edoceD
+
+        return found
     }
 
+    
+
+    
 }
+
 
 
 
