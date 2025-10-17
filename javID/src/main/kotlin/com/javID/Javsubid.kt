@@ -92,9 +92,12 @@ class Javsubid : MainAPI() {
 	): Boolean {
         
 		val document = app.get(data).document
-        val script=document.select("script:containsData(iframe_url)").html()
-        val IFRAME_B64_REGEX = Regex(""""iframe_url":"([^"]+)"""")
-         val iframeUrls = IFRAME_B64_REGEX.findAll(script)
+//        val script = document.select("div.box-server" > a)?.attr(onclick).text
+//			map base64 inside onclick
+//        val IFRAME_B64 = document.select("div.box-server" > a)?.attr(onclick).text
+		
+        
+		val iframeUrls = IFRAME_B64_REGEX.findAll(script)
              .map { it.groupValues[1] }
              .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
              .toList()
