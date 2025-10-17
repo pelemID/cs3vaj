@@ -31,7 +31,7 @@ class Javsubid : MainAPI() {
 		val query = request.data.substringAfter("?", "")
 		
 	val document = app.get("${mainUrl}/$baseUrl/page/$page?$query").document
-        val home = document.select("#main")
+        val home = document.select("#main > div.videos-list > article")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -44,9 +44,9 @@ class Javsubid : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse {
-        val title = this.select("article > a").attr("title")
-        val href = this.select("article > a").attr("href")
-        val posterUrl = this.select("article > a > div > div > img").attr("data-src")
+        val title = this.select("a").attr("title")
+        val href = this.select("a").attr("href")
+        val posterUrl = this.select("a > div > div > img").attr("data-src")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
