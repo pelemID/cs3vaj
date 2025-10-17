@@ -30,7 +30,7 @@ class Javsubid : MainAPI() {
 		val baseUrl = request.data.substringBefore("?")
 		val query = request.data.substringAfter("?", "")
 		
-		val document = app.get("$mainUrl/$baseUrl/page/$page?$query").document
+	val document = app.get("${mainUrl}/$baseUrl/page/$page?$query").document
         val home = document.select("#main > div.videos-list")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
@@ -72,11 +72,11 @@ class Javsubid : MainAPI() {
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
 
-        val title= document.selectFirst("div.title-block box-shadow > h1")?.text().toString()
+        val title= document.selectFirst("h1.entry-title")?.text().toString()
         val poster = document.selectFirst("div.video-player > meta:nth-child(5)") 
                     ?.attr("content")?.trim().orEmpty()
-        val description = document.selectFirst("div.video-player > meta:nth-child(3)")
-                    ?.attr("content")?.trim().orEmpty()
+        val description = document.selectFirst("div.video-description > div > p")
+					?.text().trim().orEmpty()
 
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
@@ -84,8 +84,14 @@ class Javsubid : MainAPI() {
         }
     }
 
-     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
-        val document = app.get(data).document
+     override suspend fun loadLinks(
+		data: String, 
+		isCasting: Boolean, 
+		subtitleCallback: (SubtitleFile) -> Unit, 
+		callback: (ExtractorLink) -> Unit
+	): Boolean {
+        
+		val document = app.get(data).document
         val script=document.select("script:containsData(iframe_url)").html()
         val IFRAME_B64_REGEX = Regex(""""iframe_url":"([^"]+)"""")
          val iframeUrls = IFRAME_B64_REGEX.findAll(script)
