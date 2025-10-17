@@ -76,7 +76,7 @@ class Javsubid : MainAPI() {
         val poster = document.selectFirst("div.video-player > meta:nth-child(5)") 
                     ?.attr("content")?.trim().orEmpty()
         val description = document.selectFirst("div.video-description > div > p")
-					?.text().trim().orEmpty()
+					?.text()?.trim().orEmpty()
 
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
