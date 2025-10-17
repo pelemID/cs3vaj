@@ -9,7 +9,7 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class javraja : MainAPI() {
-    override var mainUrl              = "https://rajajav.com"
+    override var mainUrl              = "https://ruangjav.com"
     override var name                 = "Javraja"
     override val hasMainPage          = true
     override var lang                 = "en"
@@ -30,7 +30,7 @@ class javraja : MainAPI() {
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val document = app.get("$mainUrl/${request.data}/?page=$page").document
+        val document = app.get("$mainUrl/${request.data}/page/?page=$page").document
         val home =  document.select("div.bx").map { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -153,6 +153,7 @@ class javraja : MainAPI() {
     }
 
 }
+
 
 
 
