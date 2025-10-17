@@ -45,8 +45,8 @@ class Javsubid : MainAPI() {
 
     private fun Element.toSearchResult(): SearchResponse {
         val title = this.select("article > a").attr("title")
-        val href = this.select("article > a").attr("href"))
-        val posterUrl = this.select("article > a > div > div > img").attr("data-src"))
+        val href = this.select("article > a").attr("href")
+        val posterUrl = this.select("article > a > div > div > img").attr("data-src")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
