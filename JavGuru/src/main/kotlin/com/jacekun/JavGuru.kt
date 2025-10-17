@@ -1,127 +1,177 @@
 package com.jacekun
 
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.TvType
+import android.util.Base64
+import com.lagradost.api.Log
+//import android.util.Log
+import org.jsoup.nodes.Element
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class JavGuru : MainAPI() {
-    private val DEV = "DevDebug"
-    private val globaltvType = TvType.NSFW
+    override var mainUrl              = "https://jav.guru/"
+    override var name                 = "JavGuru"
+    override val hasMainPage          = true
+    override var lang                 = "en"
+    override val supportedTypes       = setOf(TvType.NSFW)
+    override val vpnStatus            = VPNStatus.MightBeNeeded
 
-    override var name = "Jav Guru"
-    override var mainUrl = "https://jav.guru"
-    override val supportedTypes = setOf(TvType.NSFW)
-    override val hasDownloadSupport = false
-    override val hasMainPage = true
-    override val hasQuickSearch = false
+    override val mainPage = mainPageOf(
+        // Fixed entries
+            "" to "Main Page",
+            "category/english-subbed" to "English Subbed",
+            "category/english-subbed/?orderby=likes&order=DESC" to "English Subbed most likes",
+            "tag/for-women" to "For Women",
+            "actress/hanamiya-amu" to "Amu",
 
-    override suspend fun getMainPage(
-        page: Int,
-        request: MainPageRequest
-    ): HomePageResponse {
-        val all = ArrayList<HomePageList>()
+        // Random 3 every refresh
+            *listOf(
+                "category/jav-uncensored" to "Uncensored",
+                "category/amateur" to "Amateur",
+                "category/fc2" to "FC2",
+                "category/idol" to "Idol",
+                "tag/drama" to "Drama",
+                "/tag/debut-production" to "Debut",
+                "tag/masturbation" to "Masturbation",
+                "tag/married-woman" to "Married Woman",
+                "tag/mature-woman" to "Mature Woman",
+                "studio/ipzz" to "IdeaPocket",
+                "studio/mida" to "Moodyz",
+                "series/身も心も相性抜群の2人-。想いと唇が重な" to "Compatibility",
+                "series/超高級中出し専門ソープ" to "Soapland",
+            ).shuffled().take(3).toTypedArray()
+    )
 
-        val mainbody = app.get(mainUrl).document.getElementsByTag("body").select("div#page")
-            .select("div#content").select("div#primary")
-            .select("main")
+    
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val document = app.get("$mainUrl/${request.data}/page/$page").document
+        val home = document.select("#main > div")
+            .mapNotNull { it.toSearchResult() }
+        return newHomePageResponse(
+            list = HomePageList(
+                name = request.name,
+                list = home,
+                isHorizontalImages = true
+            ),
+            hasNext = true
+        )
+    }
 
-        //Log.i(DEV, "Main body => $mainbody")
-        // Fetch row title
-        val title = "Homepage"
-        // Fetch list of items and map
-        mainbody.select("div.row").let { inner ->
-            val elements: List<SearchResponse> = inner.map {
-
-                val innerArticle = it.select("div.column")
-                    .select("div.inside-article").select("div.imgg")
-                //Log.i(DEV, "Inner content => $innerArticle")
-                val aa = innerArticle.select("a").firstOrNull()
-                val link = fixUrl(aa?.attr("href") ?: "")
-
-                val imgArticle = aa?.select("img")
-                val name = imgArticle?.attr("alt") ?: "<No Title>"
-                val image = imgArticle?.attr("src")
-                val year = null
-
-                newMovieSearchResponse(
-                    name = name,
-                    url = link,
-                    type = globaltvType,
-                ).apply {
-                    //this.apiName = this@JavGuru.name
-                    this.posterUrl = image
-                    this.year = year
-                    this.id = null
-                }
-            }
-
-            all.add(
-                HomePageList(
-                    title, elements
-                )
-            )
+    private fun Element.toSearchResult(): SearchResponse {
+        val title     = this.select("div > div > div > a > img").attr("alt")
+        val href      = fixUrl(this.select("div > div > div > a").attr("href"))
+        val posterUrl = fixUrlNull(this.select("div > div > div > a > img").attr("src"))
+        return newMovieSearchResponse(title, href, TvType.NSFW) {
+            this.posterUrl = posterUrl
         }
-        return newHomePageResponse(all)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val url = "$mainUrl/?s=${query}"
+        val searchResponse = mutableListOf<SearchResponse>()
 
-        return app.get(url).document
-            .select("main.site-main").select("div.row").mapNotNull {
-
-            val aa = it.select("div.column").select("div.inside-article")
-                .select("div.imgg").select("a")
-            val imgrow = aa.select("img")
-
-            val href = fixUrlNull(aa.attr("href")) ?: return@mapNotNull null
-            val title = imgrow.attr("alt")
-            val image = imgrow.attr("src").trim('\'')
-            val year = Regex("(?<=\\/)(.[0-9]{3})(?=\\/)")
-                .find(image)?.groupValues?.get(1)?.toIntOrNull()
-
-            newMovieSearchResponse(
-                name = title,
-                url = href,
-                type = globaltvType,
-            ).apply {
-                //this.apiName = this@JavGuru.name
-                this.posterUrl = image
-                this.year = year
+        for (i in 1..3) {
+            val document = app.get("${mainUrl}/page/$i/?s=$query").document
+            val results = document.select("#main > div").mapNotNull { it.toSearchResult() }
+            if (!searchResponse.containsAll(results)) {
+                searchResponse.addAll(results)
+            } else {
+                break
             }
+            if (results.isEmpty()) break
+        }
+        return searchResponse
+    }
+
+
+    private suspend fun findposAct(namanya: String) : String {
+        val encodedName = namanya.trim().replace(" ", "+")
+        val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$encodedName").document
+        
+        // find <img> where alt == namanya
+        return document.selectFirst("div.actress-pic img[alt=\"$namanya\"]")
+                ?.attr("src")
+                .orEmpty()
+    }
+
+        
+    override suspend fun load(url: String): LoadResponse {
+        val document = app.get(url).document
+
+        val title= document.selectFirst("div.posts > h1")?.text().toString()
+        val poster = document.selectFirst("div.wp-content > p > img")
+                    ?.attr("src")
+                    ?.trim()
+                    ?: document.selectFirst("div.large-screenimg > img")
+                    ?.attr("src")
+                    ?.trim()
+                    .orEmpty()
+        val description = document.selectFirst("div.wp-content p")
+                    ?.text()
+                    ?.trim()
+                    ?: document.select("li:has(strong:matchesOwn(Actress)) a")
+                    ?.eachText()
+                    ?.joinToString(", ")
+                    .orEmpty()
+
+         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(8).map {
+                    Actor(
+                            it.text(),
+                            findposAct(it.text())
+                    )
+                }
+                    
+        //val actress = cariArtis(document.select("li:has(strong:matchesOwn(Actress)) a")?.eachText()
+        return newMovieLoadResponse(title, url, TvType.NSFW, url) {
+            this.posterUrl = poster
+            this.plot      = description
+            addActors(actors)
         }
     }
 
-    override suspend fun load(url: String): LoadResponse {
-        //Log.i(DEV, "Url => ${url}")
-        val body = app.get(url).document.getElementsByTag("body")
-            .select("div#page")
-            .select("div#content").select("div.content-area")
-            .select("main").select("article")
-            .select("div.inside-article").select("div.content")
-            .select("div.posts")
+     override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
+        val document = app.get(data).document
+        val script=document.select("script:containsData(iframe_url)").html()
+        val IFRAME_B64_REGEX = Regex(""""iframe_url":"([^"]+)"""")
+         val iframeUrls = IFRAME_B64_REGEX.findAll(script)
+             .map { it.groupValues[1] }
+             .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
+             .toList()
+         iframeUrls.forEach {
+             Log.d("Phisher",it)
+             val iframedoc=app.get(it, referer = it).document
+             val olid=iframedoc.toString().substringAfter("var OLID = '").substringBefore("'")
+             val newreq=iframedoc.toString().substringAfter("iframe").substringAfter("src=\"").substringBefore("'+OLID")
+             val reverseid= olid.edoceD()
+             val location= app.get("$newreq$reverseid", referer = it, allowRedirects = false)
+             val link=location.headers["location"].toString()
+             if (link.contains(".m3u"))
+             {
+                 callback.invoke(
+                     newExtractorLink(
+                         source = name,
+                         name = name,
+                         url = link,
+                         INFER_TYPE
+                     ) {
+                         this.referer = ""
+                         this.quality = getQualityFromName("")
+                     }
+                 )
+             }
+             else{
+                 loadExtractor(link, referer = it,subtitleCallback,callback)
+             }
+         }
+        return true
+    }
 
-        //Log.i(DEV, "Result => ${body}")
-        val poster = body.select("div.large-screenshot").select("div.large-screenimg")
-            .select("img").attr("src")
-        val title = body.select("h1.titl").text()
-        val descript = body.select("div.wp-content").select("p").firstOrNull()?.text()
-        val streamUrl = ""
-        val infometa_list = body.select("div.infometa > div.infoleft > ul > li")
-        val year = infometa_list.getOrNull(1)?.text()?.takeLast(10)?.substring(0, 4)?.toIntOrNull()
-
-        return newMovieLoadResponse(
-            name = title,
-            url = url,
-            type = globaltvType,
-            dataUrl = streamUrl,
-        ).apply {
-            this.apiName = this@JavGuru.name
-            this.posterUrl = poster
-            this.year = year
-            this.plot = descript
-            this.comingSoon = true
+    fun String.edoceD(): String {
+        var x = this.length - 1
+        var edoceD = ""
+        while (x >= 0) {
+            edoceD += this[x]
+            x--
         }
+        return edoceD
     }
 }
