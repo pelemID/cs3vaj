@@ -8,7 +8,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
-class Javguru : MainAPI() {
+class Javsubid : MainAPI() {
     override var mainUrl              = "https://javsubid.sx"
     override var name                 = "Javsubid"
     override val hasMainPage          = true
@@ -27,16 +27,10 @@ class Javguru : MainAPI() {
     
 	override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         
-		val baseUrl = request.data.substringBefore("?") // "category/jav-sub-indo"
-		val query = request.data.substringAfter("?", "") // "?filter=latest"
+		val baseUrl = request.data.substringBefore("?")
+		val query = request.data.substringAfter("?", "")
 		
-		val url = if (page == 1) {
-			"$mainUrl/${request.data}"
-       } else {
-			"$mainUrl/$baseUrl/page/$page?$query"
-	   }
-		
-		val document = app.get(url).document
+		val document = app.get("$mainUrl/$baseUrl/page/$page?$query").document
         val home = document.select("#main > div.videos-list")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
