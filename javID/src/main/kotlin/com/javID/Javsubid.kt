@@ -20,8 +20,8 @@ class Javsubid : MainAPI() {
         // Fixed entries
             "category/jav-sub-indo?filter=latest" to "Terbaru",
             "category/jav-sub-indo?filter=most-viewed" to "Populer",
-            "category/jav-sub-indo?filter=random" to "Acak",
             "category/jav-sub-indo?filter=longest" to "Cerita Panjang"
+            "category/jav-sub-indo?filter=random" to "Acak",
     )
     
     
@@ -69,48 +69,18 @@ class Javsubid : MainAPI() {
     }
 
 
-    private suspend fun findposAct(namanya: String) : String {
-        val encodedName = namanya.trim().replace(" ", "+")
-        val document = app.get("${mainUrl}/actress-search/?taxonomy_search=$encodedName").document
-        
-        // find <img> where alt == namanya
-        return document.selectFirst("div.actress-pic img[alt=\"$namanya\"]")
-                ?.attr("src")
-                .orEmpty()
-    }
-
-        
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
 
-        val title= document.selectFirst("div.posts > h1")?.text().toString()
-        val poster = document.selectFirst("div.wp-content > p > img")
-                    ?.attr("src")
-                    ?.trim()
-                    ?: document.selectFirst("div.large-screenimg > img")
-                    ?.attr("src")
-                    ?.trim()
-                    .orEmpty()
-        val description = document.selectFirst("div.wp-content p")
-                    ?.text()
-                    ?.trim()
-                    ?: document.select("li:has(strong:matchesOwn(Actress)) a")
-                    ?.eachText()
-                    ?.joinToString(", ")
-                    .orEmpty()
+        val title= document.selectFirst("div.title-block box-shadow > h1")?.text().toString()
+        val poster = document.selectFirst("div.video-player > meta:nth-child(5)") 
+                    ?.attr("content")?.trim().orEmpty()
+        val description = document.selectFirst("div.video-player > meta:nth-child(3)")
+                    ?.attr("content")?.trim().orEmpty()
 
-         val actors = document.select("li:has(strong:matchesOwn(Actress)) a").take(8).map {
-                    Actor(
-                            it.text(),
-                            findposAct(it.text())
-                    )
-                }
-                    
-        //val actress = cariArtis(document.select("li:has(strong:matchesOwn(Actress)) a")?.eachText()
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
             this.posterUrl = poster
-            this.plot      = description
-            addActors(actors)
+            this.plot = description
         }
     }
 
