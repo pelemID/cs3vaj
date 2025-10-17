@@ -31,7 +31,7 @@ class Javsubid : MainAPI() {
 		val query = request.data.substringAfter("?", "")
 		
 	val document = app.get("${mainUrl}/$baseUrl/page/$page?$query").document
-        val home = document.select("#main > div.videos-list")
+        val home = document.select("#main")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
