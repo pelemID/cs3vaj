@@ -245,6 +245,6 @@ class d000d : DoodLaExtractor() {
 }
 
 class Moonfile : FileMoon(){
-    override val mainUrl = "https://moonfile.xyz"
+    override var mainUrl = "https://moonfile.xyz"
 }
 
