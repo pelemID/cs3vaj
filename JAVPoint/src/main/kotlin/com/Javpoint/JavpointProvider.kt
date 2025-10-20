@@ -14,7 +14,7 @@ class JavpointProvider: Plugin() {
         registerMainAPI(Javgg())
         registerMainAPI(Javguru())
 //        registerMainAPI(JavEnglish())
-//        registerMainAPI(Javangel())
+        registerMainAPI(Javangel())
         registerExtractorAPI(DoodJav())
         registerExtractorAPI(d000d())
         registerExtractorAPI(VidhideVIP())
