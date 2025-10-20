@@ -211,11 +211,6 @@ open class Javggvideo : ExtractorApi() {
     }
 }
 
-class Moonfile : FileMoonV2(){
-    override var mainUrl = "https://moonfile.xyz"
-    override var name = "Moonfilexyz"
-}
-
 class Javlion : Vidhidepro() {
     override var mainUrl = "https://javlion.xyz"
     override val name = "Javlion"
