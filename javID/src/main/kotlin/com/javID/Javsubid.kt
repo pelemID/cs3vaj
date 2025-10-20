@@ -84,62 +84,25 @@ class Javsubid : MainAPI() {
         }
     }
 
-/*        
 	override suspend fun loadLinks(
-		data: String, 
-		isCasting: Boolean, 
-		subtitleCallback: (SubtitleFile) -> Unit, 
-		callback: (ExtractorLink) -> Unit
+    	data: String,
+    	isCasting: Boolean,
+    	subtitleCallback: (SubtitleFile) -> Unit,
+    	callback: (ExtractorLink) -> Unit
 	): Boolean {
-        
-		val document = app.get(data).document
-//        val script = document.select("div.box-server" > a)?.attr(onclick).text
-//			map base64 inside onclick
-//        val IFRAME_B64 = document.select("div.box-server" > a)?.attr(onclick).text
-		
+    	val document = app.get(data).document
 
-		val iframeUrls = IFRAME_B64_REGEX.findAll(script)
-             .map { it.groupValues[1] }
-             .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
-             .toList()
-         iframeUrls.forEach {
-             Log.d("Phisher",it)
-             val iframedoc=app.get(it, referer = it).document
-             val olid=iframedoc.toString().substringAfter("var OLID = '").substringBefore("'")
-             val newreq=iframedoc.toString().substringAfter("iframe").substringAfter("src=\"").substringBefore("'+OLID")
-             val reverseid= olid.edoceD()
-             val location= app.get("$newreq$reverseid", referer = it, allowRedirects = false)
-             val link=location.headers["location"].toString()
-             if (link.contains(".m3u"))
-             {
-                 callback.invoke(
-                     newExtractorLink(
-                         source = name,
-                         name = name,
-                         url = link,
-                         INFER_TYPE
-                     ) {
-                         this.referer = ""
-                         this.quality = getQualityFromName("")
-                     }
-                 )
-             }
-             else{
-                 loadExtractor(link, referer = it,subtitleCallback,callback)
-             }
-         }
-        return true
+    	document.select("div.box-server > a").forEach { element ->
+        	val onclick = element.attr("onclick")
+        	val base64 = Regex("atob\\('([^']+)'\\)").find(onclick)?.groupValues?.get(1)
+        	if (base64.isNullOrEmpty()) return@forEach
 
-    }
-*/
+        	val decodedUrl = String(android.util.Base64.decode(base64, android.util.Base64.DEFAULT))
+        	Log.d("Phisher", "Decoded URL: $decodedUrl")
 
-    fun String.edoceD(): String {
-        var x = this.length - 1
-        var edoceD = ""
-        while (x >= 0) {
-            edoceD += this[x]
-            x--
-        }
-        return edoceD
-    }
+        	// Send link to extractor
+        	loadExtractor(decodedUrl, subtitleCallback = subtitleCallback, callback = callback)
+    	}
+		return true
+	}
 }
