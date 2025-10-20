@@ -96,7 +96,7 @@ class Javsubid : MainAPI() {
 //			map base64 inside onclick
 //        val IFRAME_B64 = document.select("div.box-server" > a)?.attr(onclick).text
 		
-        
+/*        
 		val iframeUrls = IFRAME_B64_REGEX.findAll(script)
              .map { it.groupValues[1] }
              .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
@@ -128,6 +128,7 @@ class Javsubid : MainAPI() {
              }
          }
         return true
+*/
     }
 
     fun String.edoceD(): String {
