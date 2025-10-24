@@ -29,7 +29,7 @@ class Javruang : MainAPI() {
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val document = app.get("$mainUrl/${request.data}/page/$page").document
         val home =  document.select("article.box").map { it.toSearchResult() }
-            .mapNotNull { it.toSearchResult() }
+
         return newHomePageResponse(
             list = HomePageList(
                 name = request.name,
@@ -138,7 +138,7 @@ class Javruang : MainAPI() {
 
     data class ResponseModel(
         val success: Boolean = false,
-        val url: String? = null,
+        val url: String = null,
     )
     
 }
