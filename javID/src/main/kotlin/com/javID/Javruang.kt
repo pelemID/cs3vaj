@@ -3,11 +3,13 @@ package com.JavID
 import org.jsoup.nodes.Element
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-//import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.AppUtils.parseJson
+import com.lagradost.cloudstream3.utils.AppUtils.toJson
+import com.lagradost.cloudstream3.utils.ExtractorLink
 //import com.lagradost.cloudstream3.utils.httpsify
 //import com.lagradost.cloudstream3.utils.loadExtractor
 //import java.net.URI
-//import org.jsoup.nodes.Element
+
 
 class Javruang : MainAPI() {
     override var mainUrl = "https://ruangjav.com"
