@@ -32,7 +32,7 @@ class Javruang : MainAPI() {
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val document = app.get("$mainUrl/${request.data}/page/$page").document
-        val home = document.select("div.items > article")
+        val home =  document.select("article.box").map { it.toSearchResult() }
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -45,9 +45,10 @@ class Javruang : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse {
-        val title = this.select("div.poster > a").attr("title")
-        val href = fixUrl(this.select("div.poster > a").attr("href"))
-        val posterUrl = this.select("div.poster > img").attr("src")
+        val title     = this.select("a.tip").attr("title")
+        val href      = this.select("a.tip").attr("href")
+        val posterUrl = this.select("a.tip > div.limit > img").attr("src")
+        //.replace(Regex("(_resized)?\\.webp$"), ".jpg")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
