@@ -118,7 +118,6 @@ class Javruang : MainAPI() {
         val videoId = document.selectFirst("meta[name=video-id]")?.attr("content")
         val directUrl = "https://embedplayer.xyz/embed/index.php?id=$videoId"
         try {
-            val videoId = data // or extract from URL if needed
             for (serverId in 1..8) {
                 val apiUrl = "https://embedplayer.xyz/embed/get_server_url.php?video_id=$videoId&server_id=$serverId"
                 val response = app.get(apiUrl).text
