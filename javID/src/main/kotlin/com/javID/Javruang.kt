@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.utils.*
 
 class Javruang : MainAPI() {
     override var mainUrl = "https://ruangjav.com"
+    private var directUrl: String? = null
     override var name = "Javruang"
     override val hasMainPage = true
     override var lang = "en"
@@ -107,6 +108,7 @@ class Javruang : MainAPI() {
         }
     }
 
+
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -114,87 +116,23 @@ class Javruang : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         val document = app.get(data).document
-        document.select("div.pframe iframe").forEachIndexed { index, iframe ->
-            val src = iframe.attr("src")
-            val link = if ("javggvideo.xyz" in src) {
-                app.get(src).document.selectFirst("script:containsData(urlPlay)")?.data()
-                    ?.let { Regex("urlPlay\\s*=\\s*'(.*?)'").find(it)?.groupValues?.getOrNull(1) }
-            } else {
-                app.get(src).document
-                    .selectFirst("script:containsData(p,a,c,k,e,d)")?.data()
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { JsUnpacker(it).unpack() }
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { Regex("file:\"(.*?)\"").find(it)?.groupValues?.getOrNull(1) }
+        val videoId = document.selectFirst("meta[name=video-id]")?.attr("content")
+        val directUrl = "https://embedplayer.xyz/embed/index.php?id=$videoId"
+        try {
+            val videoId = data // or extract from URL if needed
+            for (serverId in 1..8) {
+                val apiUrl = "https://embedplayer.xyz/embed/get_server_url.php?video_id=$videoId&server_id=$serverId"
+                val response = app.get(apiUrl).text
+                val json = parseJson<ResponseModel>(response)
+                if (json.success && json.url.isNotBlank()) {
+                    // Hand off to Cloudstream’s extractor system
+                    loadExtractor(json.url, directUrl, subtitleCallback, callback)
+                }
             }
-            link?.let {
-                callback.invoke(
-                    newExtractorLink(
-                        source = "$name $index",
-                        name = "$name $index",
-                        url = it,
-                        ExtractorLinkType.M3U8
-                    ) {
-                        this.referer = ""
-                        this.quality = Qualities.Unknown.value
-                    }
-                )
-            }
-        }
-
-        return true
-    }
-
-/*
- override suspend fun loadLinks(
-    data: String,
-    isCasting: Boolean,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    val document = app.get(data).document
-    val id = document.selectFirst("div#muvipro_player_content_id")?.attr("data-id")
-
-    // 🎬 Ambil iframe player (streaming)
-    if (id.isNullOrEmpty()) {
-        document.select("ul.muvipro-player-tabs li a").amap { ele ->
-            val iframe = app.get(fixUrl(ele.attr("href")))
-                .document
-                .selectFirst("div.gmr-embed-responsive iframe")
-                ?.getIframeAttr()
-                ?.let { httpsify(it) }
-                ?: return@amap
-
-            loadExtractor(iframe, "$directUrl/", subtitleCallback, callback)
-        }
-    } else {
-        document.select("div.tab-content-ajax").amap { ele ->
-            val server = app.post(
-                "$directUrl/wp-admin/admin-ajax.php",
-                data = mapOf(
-                    "action" to "muvipro_player_content",
-                    "tab" to ele.attr("id"),
-                    "post_id" to "$id"
-                )
-            ).document
-                .select("iframe")
-                .attr("src")
-                .let { httpsify(it) }
-
-            loadExtractor(server, "$directUrl/", subtitleCallback, callback)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
-
-document.select("ul.gmr-download-list li a").forEach { linkEl ->
-    val downloadUrl = linkEl.attr("href")
-    if (downloadUrl.isNotBlank()) {
-        loadExtractor(downloadUrl, data, subtitleCallback, callback)
-    }
-}
-
-    return true
-}
-
-*/
     
 }
