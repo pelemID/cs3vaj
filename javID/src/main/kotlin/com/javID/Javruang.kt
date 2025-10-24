@@ -137,5 +137,11 @@ class Javruang : MainAPI() {
         }
         return false
     }
+
+
+    data class ResponseModel(
+        val success: Boolean = false,
+        val url: String? = null,
+    )
     
 }
