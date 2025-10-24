@@ -137,8 +137,8 @@ class Javruang : MainAPI() {
 
 
     data class ResponseModel(
-        val success: Boolean = false,
-        val url: String = null,
+        val success: Boolean,
+        val url: String,
     )
     
 }
