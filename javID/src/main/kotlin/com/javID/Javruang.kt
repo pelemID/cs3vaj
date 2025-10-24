@@ -23,11 +23,7 @@ class Javruang : MainAPI() {
     override val vpnStatus = VPNStatus.MightBeNeeded
 
     override val mainPage = mainPageOf(
-        "trending" to "Trending",
-        "genre/stepmother" to "Stepmother",
-        "genre/married-woman" to "Married Woman",
-        "tag/english-subtitle" to "English Subtitle",
-        "random" to "Random"
+        "jav-sub-indo-terbaru" to "Terbaru"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
