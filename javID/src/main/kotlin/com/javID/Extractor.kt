@@ -242,3 +242,8 @@ class Javmoon : Filesim() {
 class d000d : DoodLaExtractor() {
     override var mainUrl = "https://d000d.com"
 }
+
+class DSVPlay : DoodLaExtractor() {
+    override var name = "DSVPlay (Dood)"
+    override var mainUrl = "https://dsvplay.com"
+}
