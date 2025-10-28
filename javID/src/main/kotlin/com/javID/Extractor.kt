@@ -6,6 +6,9 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.extractors.DoodLaExtractor
 import com.lagradost.cloudstream3.extractors.Filesim
 import com.lagradost.cloudstream3.extractors.MixDrop
+import com.lagradost.cloudstream3.extractors.Vidguardto
+import com.lagradost.cloudstream3.extractors.StreamTape
+import com.lagradost.cloudstream3.extractors.StreamWishExtractor
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
@@ -210,6 +213,91 @@ open class Javggvideo : ExtractorApi() {
     }
 }
 
+open class Emturbovid : ExtractorApi() {
+    override val name = "Emturbovid"
+    override val mainUrl = "https://emturbovid.com"
+    override val requiresReferer = true
+
+    override suspend fun getUrl(
+            url: String,
+            referer: String?,
+            subtitleCallback: (SubtitleFile) -> Unit,
+            callback: (ExtractorLink) -> Unit
+    ) {
+        val response = app.get(url, referer = referer)
+        val m3u8 = Regex("[\"'](.*?master\\.m3u8.*?)[\"']").find(response.text)?.groupValues?.getOrNull(1)
+        M3u8Helper.generateM3u8(
+                name,
+                m3u8 ?: return,
+                mainUrl
+        ).forEach(callback)
+    }
+
+}
+
+
+open class Dingtezuni : ExtractorApi() {
+    override val name = "Earnvids"
+    override val mainUrl = "https://dingtezuni.com"
+    override val requiresReferer = true
+
+ override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val headers = mapOf(
+            "Sec-Fetch-Dest" to "empty",
+            "Sec-Fetch-Mode" to "cors",
+            "Sec-Fetch-Site" to "cross-site",
+            "Origin" to mainUrl,
+	        "User-Agent" to USER_AGENT,
+        )
+        
+        val response = app.get(getEmbedUrl(url), referer = referer)
+        val script = if (!getPacked(response.text).isNullOrEmpty()) {
+            var result = getAndUnpack(response.text)
+            if(result.contains("var links")){
+                result = result.substringAfter("var links")
+            }
+            result
+        } else {
+            response.document.selectFirst("script:containsData(sources:)")?.data()
+        } ?: return
+
+        // m3u8 urls could be prefixed by 'file:', 'hls2:' or 'hls4:', so we just match ':'
+        Regex(":\\s*\"(.*?m3u8.*?)\"").findAll(script).forEach { m3u8Match ->
+            generateM3u8(
+                name,
+                fixUrl(m3u8Match.groupValues[1]),
+                referer = "$mainUrl/",
+                headers = headers
+            ).forEach(callback)
+        }
+    }
+
+    private fun getEmbedUrl(url: String): String {
+		return when {
+			url.contains("/d/") -> url.replace("/d/", "/v/")
+			url.contains("/download/") -> url.replace("/download/", "/v/")
+			url.contains("/file/") -> url.replace("/file/", "/v/")
+			else -> url.replace("/f/", "/v/")
+		}
+	}
+
+}
+
+
+
+class StreamTapeTo : StreamTape() {
+    override var mainUrl = "https://streamtape.com"
+}
+
+class Listeamed : Vidguardto() {
+    override var mainUrl = "https://listeamed.net"
+}
+
 class Javlion : Vidhidepro() {
     override var mainUrl = "https://javlion.xyz"
     override val name = "Javlion"
@@ -247,3 +335,14 @@ class DSVPlay : DoodLaExtractor() {
     override var name = "DSVPlay (Dood)"
     override var mainUrl = "https://dsvplay.com"
 }
+
+class StreamwishHG : StreamWishExtractor() {
+    override val mainUrl = "https://hglink.to"
+}
+
+class FileMoonTo : Filesim() {
+    override var mainUrl = "https://filemoon.to"
+    override val name = "FileMoonTo"
+}
+
+
