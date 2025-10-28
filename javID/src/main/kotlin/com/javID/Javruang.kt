@@ -123,7 +123,7 @@ class Javruang : MainAPI() {
                 val json = parseJson<ResponseModel>(response)
                 if (json.success && json.url.isNotBlank()) {
                     // Hand off to Cloudstream’s extractor system
-                    loadExtractor(json.url, directUrl, subtitleCallback, callback)
+                    loadExtractor(json.url, data, subtitleCallback, callback)
                 }
             }
             return true
