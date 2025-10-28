@@ -90,13 +90,12 @@ class Javruang : MainAPI() {
         val description =
             document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
         val recommendations =
-            document.select("ul.videos.related >  li").map {
-                val recomtitle = it.selectFirst("div.video > a")?.attr("title")?.trim().toString()
-                val recomhref = it.selectFirst("div.video > a")?.attr("href").toString()
-                val recomposterUrl = it.select("div.video > a > div > img").attr("src")
-                val recomposter = "https://javdoe.sh$recomposterUrl"
+            document.select("div.los > article.box").map {
+                val recomtitle = it.selectFirst("a.tip")?.attr("title")?.trim().toString()
+                val recomhref = it.selectFirst("a.tip")?.attr("href").toString()
+                val recomposterUrl = it.select("a.tip > div > img").attr("src")
                 newAnimeSearchResponse(recomtitle, recomhref, TvType.NSFW) {
-                    this.posterUrl = recomposter
+                    this.posterUrl = recomposterUrl
                 }
             }
         //println(poster)
