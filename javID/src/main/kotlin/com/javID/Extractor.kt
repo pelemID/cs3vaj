@@ -238,7 +238,7 @@ open class Emturbovid : ExtractorApi() {
 
 }
 
-
+/*
 open class Dingtezuni : ExtractorApi() {
     override val name = "Earnvids"
     override val mainUrl = "https://dingtezuni.com"
@@ -290,7 +290,7 @@ open class Dingtezuni : ExtractorApi() {
 	}
 
 }
-
+*/
 
 
 class StreamTapeTo : StreamTape() {
