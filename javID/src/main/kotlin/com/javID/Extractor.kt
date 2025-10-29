@@ -331,7 +331,7 @@ class FileMoonTo : Filesim() {
 
 class TurboVid : EmturbovidExtractor() {
     override var mainUrl = "https://emturbovid.com"
-    override val name = "TurboVid"
+    override var name = "TurboVid"
 }
 
 
