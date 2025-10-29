@@ -10,6 +10,8 @@ import com.lagradost.cloudstream3.extractors.MixDrop
 import com.lagradost.cloudstream3.extractors.Vidguardto
 import com.lagradost.cloudstream3.extractors.StreamTape
 import com.lagradost.cloudstream3.extractors.StreamWishExtractor
+import com.lagradost.cloudstream3.extractors.Vidstream
+import com.lagradost.cloudstream3.extractors.EmturbovidExtractor
 import com.lagradost.cloudstream3.utils.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
@@ -216,27 +218,6 @@ open class Javggvideo : ExtractorApi() {
     }
 }
 
-open class Emturbovid : ExtractorApi() {
-    override val name = "Emturbovid"
-    override val mainUrl = "https://emturbovid.com"
-    override val requiresReferer = true
-
-    override suspend fun getUrl(
-            url: String,
-            referer: String?,
-            subtitleCallback: (SubtitleFile) -> Unit,
-            callback: (ExtractorLink) -> Unit
-    ) {
-        val response = app.get(url, referer = referer)
-        val m3u8 = Regex("[\"'](.*?master\\.m3u8.*?)[\"']").find(response.text)?.groupValues?.getOrNull(1)
-        M3u8Helper.generateM3u8(
-                name,
-                m3u8 ?: return,
-                mainUrl
-        ).forEach(callback)
-    }
-
-}
 
 /*
 open class Dingtezuni : ExtractorApi() {
@@ -346,6 +327,11 @@ class StreamwishHG : StreamWishExtractor() {
 class FileMoonTo : Filesim() {
     override var mainUrl = "https://filemoon.to"
     override val name = "FileMoonTo"
+}
+
+class TurboVid : EmturbovidExtractor() {
+    override var mainUrl = "https://emturbovid.com"
+    override val name = "TurboVid"
 }
 
 
