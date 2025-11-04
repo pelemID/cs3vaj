@@ -5,7 +5,7 @@ version = 1
 cloudstream {
     // All of these properties are optional, you can safely remove them
 
-    description = "Jav Sub Indo"
+    description = "Nge Jav Sub Indo"
     language    = "id"
     authors = listOf("Phisher98")
 
