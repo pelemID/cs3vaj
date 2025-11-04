@@ -115,7 +115,7 @@ class Ngejav : MainAPI() {
                 )
             }
 
-		loadExtractor(link, referer = src, subtitleCallback, callback)
+		loadExtractor(link, referer = link, subtitleCallback, callback)
         }
 
         return true
