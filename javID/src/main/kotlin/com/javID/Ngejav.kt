@@ -25,7 +25,7 @@ class Ngejav : MainAPI() {
 	override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         
 		val document = app.get("$mainUrl/${request.data}/?page=$page").document
-	    val home = document.select("table.postable > tbody > tr")
+	    val home = document.select("table.postable > tbody > tr:nth-child(odd)")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
