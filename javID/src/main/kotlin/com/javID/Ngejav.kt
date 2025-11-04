@@ -87,20 +87,36 @@ class Ngejav : MainAPI() {
     	subtitleCallback: (SubtitleFile) -> Unit,
     	callback: (ExtractorLink) -> Unit
 	 ): Boolean {
-    	val document = app.get(data).document
+        val document = app.get(data).document
+        document.select("div.iframe-wrapper iframe").forEachIndexed { index, iframe ->
+            val src = iframe.attr("src")
+            val link = if ("lelebakar.xyz" in src) {
+				app.get(src).document
+                    .selectFirst("script:containsData(p,a,c,k,e,d)")?.data()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { JsUnpacker(it).unpack() }
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { Regex("file:\"(.*?)\"").find(it)?.groupValues?.getOrNull(1) }
+            } else {
+                app.get(src).document.selectFirst("script:containsData(urlPlay)")?.data()
+                    ?.let { Regex("urlPlay\\s*=\\s*'(.*?)'").find(it)?.groupValues?.getOrNull(1) }
+            }
+            link?.let {
+                callback.invoke(
+                    newExtractorLink(
+                        source = "$name $index",
+                        name = "$name $index",
+                        url = it,
+                        ExtractorLinkType.M3U8
+                    ) {
+                        this.referer = ""
+                        this.quality = Qualities.Unknown.value
+                    }
+                )
+            }
+        }
 
-    	document.select("div.box-server > a").forEach { element ->
-        	val onclick = element.attr("onclick")
-        	val base64 = Regex("atob\\('([^']+)'\\)").find(onclick)?.groupValues?.get(1)
-        	if (base64.isNullOrEmpty()) return@forEach
-
-        	val decodedUrl = String(android.util.Base64.decode(base64, android.util.Base64.DEFAULT))
-        	Log.d("Phisher", "Decoded URL: $decodedUrl")
-
-        	// Send link to extractor
-        	loadExtractor(decodedUrl, subtitleCallback = subtitleCallback, callback = callback)
-    	}
-		return true
-	}
+        return true
+    }
 
 }
