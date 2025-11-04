@@ -18,7 +18,7 @@ class Ngejav : MainAPI() {
 
     override val mainPage = mainPageOf(
         // Fixed entries
-            "jav-sub-indo to "Sub Indo"
+            "jav-sub-indo" to "Sub Indo"
     )
     
     
