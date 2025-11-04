@@ -10,7 +10,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class Ngejav : MainAPI() {
     override var mainUrl              = "https://ngejav.life"
-    override var name                 = "Javsubid"
+    override var name                 = "Ngejav"
     override val hasMainPage          = true
     override var lang                 = "id"
     override val supportedTypes       = setOf(TvType.NSFW)
@@ -25,7 +25,7 @@ class Ngejav : MainAPI() {
 	override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         
 		val document = app.get("$mainUrl/${request.data}/?page=$page").document
-	    val home = document.select("table.postable > tbody > tr")
+	    val home = document.select("table.postable > tbody > tr:nth-child(1)")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
