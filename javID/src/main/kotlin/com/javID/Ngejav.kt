@@ -25,7 +25,7 @@ class Ngejav : MainAPI() {
 	override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         
 		val document = app.get("$mainUrl/${request.data}/?page=$page").document
-	    val home = document.select("table.postable > tbody > tr:nth-child(1)")
+	    val home = document.select("table.postable > tbody")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -41,9 +41,9 @@ class Ngejav : MainAPI() {
 //		#search-form > div.lapislist > div > table > tbody > tr:nth-child(1) > td:nth-child(2)
 
     private fun Element.toSearchResult(): SearchResponse {
-        val title = this.select("td:nth-child(1) > img").attr("title")
-		val href = this.select("td:nth-child(2) > a").attr("href")
-        val posterUrl = this.select("td:nth-child(1) > img").attr("src")
+        val title = this.select("tr > td:nth-child(1) > img").attr("title")
+		val href = this.select("tr > td:nth-child(2) > a").attr("href")
+        val posterUrl = this.select("tr > td:nth-child(1) > img").attr("src")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
