@@ -9,7 +9,7 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class Javsubid : MainAPI() {
-    override var mainUrl              = "https://javsubid.sx"
+    override var mainUrl              = "https://ngejav.life"
     override var name                 = "Javsubid"
     override val hasMainPage          = true
     override var lang                 = "id"
@@ -18,20 +18,14 @@ class Javsubid : MainAPI() {
 
     override val mainPage = mainPageOf(
         // Fixed entries
-            "category/jav-sub-indo?filter=latest" to "Terbaru",
-            "category/jav-sub-indo?filter=most-viewed" to "Populer",
-            "category/jav-sub-indo?filter=longest" to "Cerita Panjang",
-            "category/jav-sub-indo?filter=random" to "Acak",
+            "jav-sub-indo to "Sub Indo"
     )
     
     
 	override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         
-		val baseUrl = request.data.substringBefore("?")
-		val query = request.data.substringAfter("?", "")
-		
-	val document = app.get("${mainUrl}/$baseUrl/page/$page?$query").document
-        val home = document.select("#main > div.videos-list > article")
+		val document = app.get("$mainUrl/${request.data}/?page=$page").document
+	    val home = document.select("table.postable > tbody > tr")
             .mapNotNull { it.toSearchResult() }
         return newHomePageResponse(
             list = HomePageList(
@@ -43,10 +37,13 @@ class Javsubid : MainAPI() {
         )
     }
 
+//		#search-form > div.lapislist > div > table > tbody > tr:nth-child(1) > td:nth-child(1)
+//		#search-form > div.lapislist > div > table > tbody > tr:nth-child(1) > td:nth-child(2)
+
     private fun Element.toSearchResult(): SearchResponse {
-        val title = this.select("a").attr("title")
-        val href = this.select("a").attr("href")
-        val posterUrl = this.select("a > div > div > img").attr("data-src")
+        val title = this.select("td:nth-child(1) > img").attr("title")
+		val href = this.select("td:nth-child(2) > a").attr("href")
+        val posterUrl = this.select("td:nth-child(1) > img").attr("src")
         return newMovieSearchResponse(title, href, TvType.NSFW) {
             this.posterUrl = posterUrl
         }
@@ -56,8 +53,8 @@ class Javsubid : MainAPI() {
         val searchResponse = mutableListOf<SearchResponse>()
 
         for (i in 1..3) {
-            val document = app.get("${mainUrl}/page/$i/?s=$query").document
-            val results = document.select("#main > div").mapNotNull { it.toSearchResult() }
+            val document = app.get("${mainUrl}/search?q=$query&page=$i").document
+            val results = document.select("table.postable > tbody > tr").mapNotNull { it.toSearchResult() }
             if (!searchResponse.containsAll(results)) {
                 searchResponse.addAll(results)
             } else {
@@ -72,10 +69,10 @@ class Javsubid : MainAPI() {
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url).document
 
-        val title= document.selectFirst("h1.entry-title")?.text().toString()
-        val poster = document.selectFirst("div.video-player > meta:nth-child(5)") 
-                    ?.attr("content")?.trim().orEmpty()
-        val description = document.selectFirst("div.video-description > div > p")
+        val title= document.selectFirst("h1.kategori")?.text().toString()
+		val poster = document.selectFirst("div.content-wrapper > center:nth-child(3) > img") 
+                    ?.attr("src")?.trim().orEmpty()
+		val description = document.selectFirst("div.content-wrapper > div.lister > table > tbody > tr:nth-child(3) > td:nth-child(2)")
 					?.text()?.trim().orEmpty()
 
         return newMovieLoadResponse(title, url, TvType.NSFW, url) {
@@ -85,58 +82,25 @@ class Javsubid : MainAPI() {
     }
 
      override suspend fun loadLinks(
-		data: String, 
-		isCasting: Boolean, 
-		subtitleCallback: (SubtitleFile) -> Unit, 
-		callback: (ExtractorLink) -> Unit
-	): Boolean {
-        
-		val document = app.get(data).document
-//        val script = document.select("div.box-server" > a)?.attr(onclick).text
-//			map base64 inside onclick
-//        val IFRAME_B64 = document.select("div.box-server" > a)?.attr(onclick).text
-		
-        
-		val iframeUrls = IFRAME_B64_REGEX.findAll(script)
-             .map { it.groupValues[1] }
-             .map { Base64.decode(it, Base64.DEFAULT).let(::String) }
-             .toList()
-         iframeUrls.forEach {
-             Log.d("Phisher",it)
-             val iframedoc=app.get(it, referer = it).document
-             val olid=iframedoc.toString().substringAfter("var OLID = '").substringBefore("'")
-             val newreq=iframedoc.toString().substringAfter("iframe").substringAfter("src=\"").substringBefore("'+OLID")
-             val reverseid= olid.edoceD()
-             val location= app.get("$newreq$reverseid", referer = it, allowRedirects = false)
-             val link=location.headers["location"].toString()
-             if (link.contains(".m3u"))
-             {
-                 callback.invoke(
-                     newExtractorLink(
-                         source = name,
-                         name = name,
-                         url = link,
-                         INFER_TYPE
-                     ) {
-                         this.referer = ""
-                         this.quality = getQualityFromName("")
-                     }
-                 )
-             }
-             else{
-                 loadExtractor(link, referer = it,subtitleCallback,callback)
-             }
-         }
-        return true
-    }
+		data: String,
+    	isCasting: Boolean,
+    	subtitleCallback: (SubtitleFile) -> Unit,
+    	callback: (ExtractorLink) -> Unit
+	 ): Boolean {
+    	val document = app.get(data).document
 
-    fun String.edoceD(): String {
-        var x = this.length - 1
-        var edoceD = ""
-        while (x >= 0) {
-            edoceD += this[x]
-            x--
-        }
-        return edoceD
-    }
+    	document.select("div.box-server > a").forEach { element ->
+        	val onclick = element.attr("onclick")
+        	val base64 = Regex("atob\\('([^']+)'\\)").find(onclick)?.groupValues?.get(1)
+        	if (base64.isNullOrEmpty()) return@forEach
+
+        	val decodedUrl = String(android.util.Base64.decode(base64, android.util.Base64.DEFAULT))
+        	Log.d("Phisher", "Decoded URL: $decodedUrl")
+
+        	// Send link to extractor
+        	loadExtractor(decodedUrl, subtitleCallback = subtitleCallback, callback = callback)
+    	}
+		return true
+	}
+
 }
