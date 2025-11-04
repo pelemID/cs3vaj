@@ -12,6 +12,7 @@ class JavpointProvider: Plugin() {
     override fun load(context: Context) {
         registerMainAPI(Javsubid())
         registerMainAPI(Javruang())
+        registerMainAPI(Ngejav())
         registerExtractorAPI(DoodJav())
         registerExtractorAPI(d000d())
         registerExtractorAPI(VidhideVIP())
