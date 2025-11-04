@@ -90,10 +90,6 @@ class Streamhihi : Streamwish() {
     override var mainUrl = "https://streamhihi.com"
 }
 
-class Streamlele : StreamWishExtractor() {
-    override var name = "Streamlele"
-    override var mainUrl = "https://lelebakar.xyz"
-}
 
 
 open class Streamwish : ExtractorApi() {
@@ -283,11 +279,6 @@ open class Dingtezuni : ExtractorApi() {
 class StreamTapeTo : StreamTape() {
 	override var mainUrl = "https://streamtape.com"
 	override var name = "streamtapeto"
-}
-
-class StreamTapeDVS : StreamTape() {
-    override var mainUrl = "https://dvsplay.com"
-	override var name = "StreamTapeDVS"
 }
 
 class Listeamed : Vidguardto() {
